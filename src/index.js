@@ -25,13 +25,16 @@ function onSubmitForm(evt) {
 
   getApi(evt.target[0].value)
     .then(resp => {
+      if (resp.data.hits.length === 0) {
+        return Notify.failure(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      }
       renderGallery(resp.data.hits);
     })
-    .catch(() =>
-      Notify.info(
-        'Sorry, there are no images matching your search query. Please try again.'
-      )
-    );
+    .catch(error => {
+      console.log(error);
+    });
 }
 
 function getApi(value) {
@@ -51,7 +54,7 @@ function renderGallery(photos) {
     .map(photo => {
       console.log(photo);
       return `<div class="photo-card">
-  <img src="${photo.webformatURL}" alt="${photo.tags}" loading="lazy" />
+  <img src="${photo.webformatURL}" alt="${photo.tags}" loading="lazy" width=320 height=220 />
   <div class="info">
     <p class="info-item">${photo.likes}
       <b>Likes</b>
