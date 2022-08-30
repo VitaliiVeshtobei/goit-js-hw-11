@@ -6,7 +6,6 @@ export default class SearchService {
   }
 
   getApi() {
-    console.log(this);
     const BASE_URL = 'https://pixabay.com/api/';
     const params = {
       key: '29558697-85a489dc53885da2ee650bf34',
@@ -20,7 +19,8 @@ export default class SearchService {
 
     return axios(BASE_URL, { params }).then(resolve => {
       this.page += 1;
-      return resolve.data.hits;
+      console.log(resolve);
+      return resolve.data;
     });
   }
   resetPage() {
@@ -33,5 +33,11 @@ export default class SearchService {
 
   set query(newQuery) {
     this.searchQuery = newQuery;
+  }
+  get pageNumber() {
+    return this.page;
+  }
+  set pageNumber(newPage) {
+    this.page = newPage;
   }
 }

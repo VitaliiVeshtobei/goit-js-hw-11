@@ -4,8 +4,9 @@ import SearchService from './search-service';
 import LoadMoreBtn from './load-more-btn';
 
 const searchService = new SearchService();
+
 const loadMoreBtn = new LoadMoreBtn({
-  selector: '.load-more',
+  selector: '[data-action="load-more"]',
   hidden: true,
 });
 
@@ -29,7 +30,6 @@ function onInput(evt) {
   if (evt.target.value !== '') {
     return (refs.searchBtn.disabled = false);
   }
-  // refs.searchBtn.disabled = false;
 }
 
 function onSubmitForm(evt) {
@@ -46,7 +46,11 @@ function onSubmitForm(evt) {
         );
       }
       clearGallery();
-      renderGallery(data);
+      Notify.info(`Hooray! We found ${data.totalHits} images.`);
+      renderGallery(data.hits);
+      if (data.totalHits <= 40) return;
+      loadMoreBtn.show();
+      loadMoreBtn.enable();
     })
     .catch(error => {
       console.log(error);
@@ -55,8 +59,19 @@ function onSubmitForm(evt) {
   refs.searchBtn.disabled = true;
 }
 function onLoadMore(evt) {
+  loadMoreBtn.disable();
   searchService.getApi().then(data => {
-    renderGallery(data);
+    if (data.totalHits / searchService.pageNumber < 40) {
+      renderGallery(data.hits);
+      loadMoreBtn.hide();
+      Notify.warning(
+        "We're sorry, but you've reached the end of search results."
+      );
+      return;
+    }
+
+    renderGallery(data.hits);
+    loadMoreBtn.enable();
   });
 }
 
