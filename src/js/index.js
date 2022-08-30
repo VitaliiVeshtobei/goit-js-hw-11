@@ -1,8 +1,13 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
 import SearchService from './search-service';
+import LoadMoreBtn from './load-more-btn';
 
 const searchService = new SearchService();
+const loadMoreBtn = new LoadMoreBtn({
+  selector: '.load-more',
+  hidden: true,
+});
 
 const DEBOUNCE_DELAY = 300;
 
@@ -10,13 +15,12 @@ const refs = {
   searchForm: document.querySelector('.search-form'),
   input: document.querySelector('[name="searchQuery"]'),
   searchBtn: document.querySelector('.search'),
-  loadMoreBtn: document.querySelector('.load-more'),
   gallery: document.querySelector('.gallery'),
 };
 
 refs.searchForm.addEventListener('submit', onSubmitForm);
 refs.input.addEventListener('input', debounce(onInput, DEBOUNCE_DELAY));
-refs.loadMoreBtn.addEventListener('click', onLoadMore);
+loadMoreBtn.refs.button.addEventListener('click', onLoadMore);
 refs.searchBtn.disabled = true;
 
 function onInput(evt) {

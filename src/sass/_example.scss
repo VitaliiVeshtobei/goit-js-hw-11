@@ -7,11 +7,27 @@
 .search-form {
   padding-top: 20px;
   padding-bottom: 20px;
-  background-color: tomato;
+  background-color: rgb(62, 62, 223);
   text-align: center;
 }
 .load-more {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+.info {
+  font-size: 12px;
+  display: flex;
+}
+.is-hidden {
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  margin: -1px;
 }
