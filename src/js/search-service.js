@@ -5,7 +5,7 @@ export default class SearchService {
     this.page = 1;
   }
 
-  getApi() {
+  async getApi() {
     const BASE_URL = 'https://pixabay.com/api/';
     const params = {
       key: '29558697-85a489dc53885da2ee650bf34',
@@ -17,11 +17,9 @@ export default class SearchService {
       per_page: '40',
     };
 
-    return axios(BASE_URL, { params }).then(resolve => {
-      this.page += 1;
-      console.log(resolve);
-      return resolve.data;
-    });
+    const resolve = await axios(BASE_URL, { params });
+    this.page += 1;
+    return resolve.data;
   }
   resetPage() {
     this.page = 1;

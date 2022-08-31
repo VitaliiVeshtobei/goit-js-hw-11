@@ -32,35 +32,37 @@ function onInput(evt) {
   }
 }
 
-function onSubmitForm(evt) {
+async function onSubmitForm(evt) {
   evt.preventDefault();
-
   searchService.query = evt.currentTarget.elements.searchQuery.value;
   searchService.resetPage();
-  searchService
-    .getApi()
-    .then(data => {
-      if (data.length === 0) {
-        return Notify.failure(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      }
-      clearGallery();
-      Notify.info(`Hooray! We found ${data.totalHits} images.`);
-      renderGallery(data.hits);
-      if (data.totalHits <= 40) return;
-      loadMoreBtn.show();
-      loadMoreBtn.enable();
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  evt.currentTarget.reset();
+
+  try {
+    const data = await searchService.getApi();
+    if (data.hits.length === 0) {
+      return Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    clearGallery();
+    Notify.info(`Hooray! We found ${data.totalHits} images.`);
+    renderGallery(data.hits);
+    if (data.totalHits <= 40) return;
+    loadMoreBtn.show();
+    loadMoreBtn.enable();
+  } catch (error) {
+    console.log(error);
+  }
+  evt.target.reset();
   refs.searchBtn.disabled = true;
 }
-function onLoadMore(evt) {
+
+async function onLoadMore(evt) {
   loadMoreBtn.disable();
-  searchService.getApi().then(data => {
+
+  try {
+    const data = await searchService.getApi();
+
     if (data.totalHits / searchService.pageNumber < 40) {
       renderGallery(data.hits);
       loadMoreBtn.hide();
@@ -69,10 +71,11 @@ function onLoadMore(evt) {
       );
       return;
     }
-
     renderGallery(data.hits);
     loadMoreBtn.enable();
-  });
+  } catch (error) {
+    console.log(error.message);
+  }
 }
 
 function renderGallery(photos) {
@@ -98,7 +101,6 @@ function renderGallery(photos) {
     })
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markupGallery);
-  // refs.gallery.innerHTML = markupGallery;
 }
 
 function clearGallery() {
