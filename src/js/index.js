@@ -2,6 +2,8 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import debounce from 'lodash.debounce';
 import SearchService from './search-service';
 import LoadMoreBtn from './load-more-btn';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const searchService = new SearchService();
 
@@ -47,6 +49,7 @@ async function onSubmitForm(evt) {
     clearGallery();
     Notify.info(`Hooray! We found ${data.totalHits} images.`);
     renderGallery(data.hits);
+
     if (data.totalHits <= 40) return;
     loadMoreBtn.show();
     loadMoreBtn.enable();
@@ -72,6 +75,7 @@ async function onLoadMore(evt) {
       return;
     }
     renderGallery(data.hits);
+    slowScroll();
     loadMoreBtn.enable();
   } catch (error) {
     console.log(error.message);
@@ -82,27 +86,44 @@ function renderGallery(photos) {
   const markupGallery = photos
     .map(photo => {
       return `<div class="photo-card">
-  <img src="${photo.webformatURL}" alt="${photo.tags}" loading="lazy" width=320 height=220 />
+      <a href="${photo.largeImageURL}"><img src="${photo.webformatURL}" alt="${photo.tags}" loading="lazy"/></a>
   <div class="info">
-    <p class="info-item">${photo.likes}
+    <p class="info-item">
       <b>Likes</b>
+      ${photo.likes}
     </p>
-    <p class="info-item">${photo.views}
+    <p class="info-item">
       <b>Views</b>
+      ${photo.views}
     </p>
-    <p class="info-item">${photo.comments}
+    <p class="info-item">
       <b>Comments</b>
+      ${photo.comments}
     </p>
-    <p class="info-item">${photo.downloads}
+    <p class="info-item">
       <b>Downloads</b>
+      ${photo.downloads}
     </p>
   </div>
 </div>`;
     })
     .join('');
   refs.gallery.insertAdjacentHTML('beforeend', markupGallery);
+  let gallery = new SimpleLightbox('.gallery a');
+  gallery.refresh();
 }
 
 function clearGallery() {
   refs.gallery.innerHTML = '';
+}
+
+function slowScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
