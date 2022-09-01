@@ -29,22 +29,32 @@ refs.searchBtn.disabled = true;
 function onInput(evt) {
   console.log(evt.target.value);
 
-  if (evt.target.value !== '') {
+  if (evt.target.value.trim() !== '') {
     return (refs.searchBtn.disabled = false);
   }
+  refs.searchBtn.disabled = true;
 }
 
 async function onSubmitForm(evt) {
   evt.preventDefault();
   searchService.query = evt.currentTarget.elements.searchQuery.value;
   searchService.resetPage();
+  // if (searchService.query.trim() === '') {
+  //   refs.searchBtn.disabled = true;
+  //   return;
+  // }
 
   try {
     const data = await searchService.getApi();
     if (data.hits.length === 0) {
-      return Notify.failure(
+      Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
+      clearGallery();
+      loadMoreBtn.hide();
+      evt.target.reset();
+      refs.searchBtn.disabled = true;
+      return;
     }
     clearGallery();
     Notify.info(`Hooray! We found ${data.totalHits} images.`);
